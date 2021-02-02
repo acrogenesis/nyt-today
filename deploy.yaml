@@ -35,6 +35,28 @@ spec:
         - name: nyt-today
           image: acrogenesis/nyt-today:latest
           imagePullPolicy: Always
+          livenessProbe:
+            httpGet:
+              port: 8080
+              path: /nyt
+              httpHeaders:
+                - name: Accept
+                  value: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+            initialDelaySeconds: 5
+            timeoutSeconds: 60
+            periodSeconds: 120
+            failureThreshold: 5
+          readinessProbe:
+            httpGet:
+              path: /nyt
+              port: 8080
+              httpHeaders:
+                - name: Accept
+                  value: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+            initialDelaySeconds: 5
+            timeoutSeconds: 60
+            periodSeconds: 120
+            successThreshold: 1
           ports:
             - containerPort: 8080
           env:
@@ -55,11 +77,11 @@ spec:
                 fieldRef:
                   fieldPath: status.podIP
         - name: tunnel
-          image: cloudflare/cloudflared:2020.12.0
+          image: cloudflare/cloudflared:2021.1.5
           imagePullPolicy: Always
           command: ["cloudflared", "tunnel"]
           args:
-            - --url=http://127.0.0.1:8080
+            - --url=http://localhost:8080
             - --hostname=nyt-today.acrogenesis.com
             - --origincert=/etc/cloudflared/cert.pem
             - --no-autoupdate
