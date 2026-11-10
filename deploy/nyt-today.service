@@ -1,0 +1,14 @@
+[Unit]
+Description=nyt-today (shell2http)
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/root/web/nyt-today
+Environment=HOME=/root
+ExecStart=/root/.local/bin/mise exec -- shell2http -host=127.0.0.1 -port=4004 -cache=3600 /nyt ./nyt.sh
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

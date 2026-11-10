@@ -1,25 +1,26 @@
 # nyt-today
 Add high quality New York Times cover to remarkable using https://github.com/Evidlo/remarkable_news
 
-## Deploy using heroku
-https://devcenter.heroku.com/articles/container-registry-and-runtime
+`GET /nyt` returns today's front page (America/Chicago date) as a 1404x1872 JPEG, cached for an hour.
+
+## Deployment
+
+Production runs on a VPS behind a Cloudflare tunnel at `https://nyt-today.acrogenesis.com/nyt`.
+
+- Checkout: `/root/web/nyt-today`, tools from `mise.toml` (shell2http, ImageMagick); Ghostscript from apt.
+- `nyt-today.service` runs shell2http on `127.0.0.1:4004`.
+
+Deploy the pushed `master` branch:
+
 ```sh
-git clone git@github.com:acrogenesis/nyt-today.git
-cd nyt-today
-export DOCKER_DEFAULT_PLATFORM=linux/amd64
-heroku container:login
-heroku create
-heroku container:push web
-heroku container:release web
-heroku open
-# if it's not working check the Resources tab on heroku to see if web is running
+ssh root@<vps> 'bash /root/web/nyt-today/deploy/deploy.sh'
 ```
 
 ## Test Locally
-Install `imagemagick`
-Install https://github.com/msoap/shell2http
+Install [mise](https://mise.jdx.dev) and Ghostscript, then:
 
-```
-shell2http -export-all-vars -cache=3600 /nyt ./entry.sh
+```sh
+mise install
+mise exec -- shell2http -cache=3600 /nyt ./nyt.sh
 open http://localhost:8080/nyt
 ```
